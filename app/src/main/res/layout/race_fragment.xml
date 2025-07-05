@@ -3,14 +3,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- Трасса с финишной линией сверху -->
+    <!-- дарога -->
     <ImageView
         android:id="@+id/raceTrack"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/race_track" />
 
-    <!-- Финишная линия -->
+    <!-- Финиш-->
     <View
         android:id="@+id/finishLine"
         android:layout_width="match_parent"
@@ -19,7 +19,7 @@
         android:layout_gravity="top"
         android:background="#FF0000" />
 
-    <!-- Стартовая линия -->
+    <!-- Старт -->
     <View
         android:id="@+id/startLine"
         android:layout_width="match_parent"
@@ -28,7 +28,7 @@
         android:layout_marginBottom="43dp"
         android:background="#00FF00" />
 
-    <!-- Участники гонки -->
+    <!-- Лашадке -->
     <ImageView
         android:id="@+id/iv_horse1"
         android:layout_width="50dp"
@@ -44,4 +44,14 @@
         android:layout_marginStart="60dp"
         android:layout_gravity="bottom|center"
         android:src="@drawable/horse" />
+
+    <!-- Кнопка старта -->
+    <Button
+        android:id="@+id/startButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="СТАРТ"
+        android:padding="16dp"
+        android:textSize="24sp" />
 </FrameLayout>
