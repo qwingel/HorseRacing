@@ -76,7 +76,7 @@ class RaceFragment : Fragment() {
 
     private fun getFinishLinePosition(): Float {
         val finishLine = view?.findViewById<View>(R.id.finishLine)
-        // если finishline = null, то возвращается 0f
+        // если finishline = null, то возвращается 0 f
         return finishLine?.top?.toFloat() ?: 0f // у финиша
     }
 
