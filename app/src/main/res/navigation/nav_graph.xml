@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    app:startDestination="@id/race">
+
+    <fragment
+        android:id="@+id/race"
+        android:name="com.example.kotlinstart.fragments.RaceFragment"
+        android:label="Скачки"
+        tools:layout="@layout/race_fragment" />
+
+    <fragment
+        android:id="@+id/history"
+        android:name="com.example.kotlinstart.fragments.HistoryFragment"
+        android:label="История"
+        tools:layout="@layout/history_fragment" />
+</navigation>
