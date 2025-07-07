@@ -1,5 +1,6 @@
 package com.example.kotlinstart.fragments
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -8,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.kotlinstart.R
@@ -17,6 +19,8 @@ class RaceFragment : Fragment() {
     private lateinit var horse1: ImageView // 1 лашадка
     private lateinit var horse2: ImageView // 2 лашадка
     private lateinit var startButton: Button // кнопка старта
+    private lateinit var overlay : View // Оверлей (затемнение)
+    private lateinit var winner : TextView // Текст с победителем
     private var raceFinished = false // флаг на проверку запущена ли гоночка
     private val handler = Handler(Looper.getMainLooper()) // привязываемся к потоку лол
 
@@ -30,6 +34,8 @@ class RaceFragment : Fragment() {
         horse1 = view.findViewById(R.id.iv_horse1)
         horse2 = view.findViewById(R.id.iv_horse2)
         startButton = view.findViewById(R.id.startButton)
+        overlay = view.findViewById(R.id.overlay)
+        winner = view.findViewById(R.id.tv_winner)
 
         startButton.setOnClickListener {
             startRace()
@@ -39,6 +45,8 @@ class RaceFragment : Fragment() {
     }
 
     private fun startRace() {
+        winner.visibility = View.GONE
+        overlay.visibility = View.GONE
         startButton.visibility = View.GONE
         raceFinished = false
 
@@ -60,16 +68,17 @@ class RaceFragment : Fragment() {
         // Расстояние на которое смещаются лошадки за рандомное время
         val distance = 10f
 
-        // Наш запрос в потом с рандомной задержкой
+        // Наш запрос в поток с рандомной задержкой
         handler.postDelayed({
-            horse.translationY -= distance
+            if (!raceFinished) {
+                horse.translationY -= distance
 
-            // Добежала ли лашадка
-            if (horse.top + horse.translationY <= getFinishLinePosition()) {
-                raceFinished = true
-                showWinner(horseNumber)
-            } else {
-                moveHorse(horse, horseNumber)
+                if (horse.top + horse.translationY <= getFinishLinePosition()) {
+                    raceFinished = true
+                    showWinner(horseNumber)
+                } else {
+                    moveHorse(horse, horseNumber)
+                }
             }
         }, randomSpeed)
     }
@@ -81,7 +90,9 @@ class RaceFragment : Fragment() {
     }
 
     private fun showWinner(horseNumber: Int) {
-        Toast.makeText(context, "Лошадь $horseNumber победила!", Toast.LENGTH_SHORT).show()
+        overlay.visibility = View.VISIBLE
+        winner.visibility = View.VISIBLE
+        winner.text = "Лошадь $horseNumber победила!"
 
         // Через 2 секунды показываем кнопку старта снова
         handler.postDelayed({
