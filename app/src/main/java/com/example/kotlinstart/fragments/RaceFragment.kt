@@ -1,19 +1,23 @@
 package com.example.kotlinstart.fragments
 
-import android.annotation.SuppressLint
+import android.icu.util.Calendar
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.os.SystemClock
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.fragment.app.Fragment
+import com.example.kotlinstart.MyApp
 import com.example.kotlinstart.R
+import com.example.kotlinstart.database.Race
 import kotlin.random.Random
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 
 class RaceFragment : Fragment() {
     private lateinit var horse1: ImageView // 1 лашадка
@@ -21,8 +25,24 @@ class RaceFragment : Fragment() {
     private lateinit var startButton: Button // кнопка старта
     private lateinit var overlay : View // Оверлей (затемнение)
     private lateinit var winner : TextView // Текст с победителем
+
     private var raceFinished = false // флаг на проверку запущена ли гоночка
     private val handler = Handler(Looper.getMainLooper()) // привязываемся к потоку лол
+    private val db = MyApp.database
+
+    private val calendar = Calendar.getInstance()
+
+    private var startTime: Long = 0
+    private var raceDuration: Double = 0.0 // В секундах с сотыми долями
+
+    private val timerRunnable = object : Runnable {
+        override fun run() {
+            val currentTime = SystemClock.elapsedRealtime()
+            raceDuration = (currentTime - startTime) / 1000.0
+
+            handler.postDelayed(this, 10)
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -54,10 +74,37 @@ class RaceFragment : Fragment() {
         horse1.translationY = 0f
         horse2.translationY = 0f
 
+        startTime = SystemClock.elapsedRealtime() // Фиксируем время старта
+        handler.post(timerRunnable) // Запускаем таймер
+
         // Побежали кони
         // айди чтобы определять какая лашадка какая
         moveHorse(horse1, 1)
         moveHorse(horse2, 2)
+    }
+
+    private fun finishRace(winner: Int) {
+        val today: Int = calendar.get(Calendar.DAY_OF_MONTH)
+        val month: Int = calendar.get(Calendar.MONTH) + 1
+        val hours = calendar.get(Calendar.HOUR_OF_DAY)
+        val minutes = calendar.get(Calendar.MINUTE)
+
+        handler.removeCallbacks(timerRunnable) // Останавливаем таймер
+
+        val race = Race(
+            date = today * 100 + month,
+            time = hours * 100 + minutes,
+            winner = winner,
+            duration = raceDuration
+        )
+
+        val raceDao = db.raceDao()
+
+        lifecycleScope.launch {
+            db.raceDao().insertRace(race) // Безопасный вызов без блока основного потока
+        }
+
+        showWinner(winner)
     }
 
     private fun moveHorse(horse: ImageView, horseNumber: Int) {
@@ -75,7 +122,8 @@ class RaceFragment : Fragment() {
 
                 if (horse.top + horse.translationY <= getFinishLinePosition()) {
                     raceFinished = true
-                    showWinner(horseNumber)
+
+                    finishRace(horseNumber)
                 } else {
                     moveHorse(horse, horseNumber)
                 }

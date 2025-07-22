@@ -2,4 +2,8 @@
     <string name="app_name">Horse racing</string>
     <string name="start">Старт</string>
     <string name="winner">Лошадб выиграла</string>
+    <string name="date">Дата</string>
+    <string name="time">Время</string>
+    <string name="winner_id">Победитель</string>
+    <string name="duration">Время забега</string>
 </resources>
